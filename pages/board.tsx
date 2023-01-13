@@ -43,7 +43,9 @@ const InitialBoardData = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
-//ボムを配置する関数
+//初期化関数
+
+
 
 export const Board: NextPage = () => {
   const [board, setBoard] = React.useState(InitialBoardData)
@@ -53,7 +55,12 @@ export const Board: NextPage = () => {
         return row.map((cell: number, j: number) => {
           return (
             <Grid key={`${i}-${j}`}>
-              <Cell CellType={board[i][j]} />
+              <Cell
+                IsOpened={false}
+                HasBomb={false}
+                HasFlag={false}
+                NearBombCount={0}
+              />
             </Grid>
           )
         })

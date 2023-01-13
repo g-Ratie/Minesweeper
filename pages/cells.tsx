@@ -10,22 +10,7 @@ import styled from 'styled-components'
 // }
 // type CellsType = typeof CellsType[keyof typeof CellsType]
 
-//TODO 変数名の変更およびenum型直す
-enum CellType {
-  None = 0,
-  nearone = 1,
-  neartwo = 2,
-  nearthree = 3,
-  nearfour = 4,
-  nearfive = 5,
-  nearsix = 6,
-  nearseven = 7,
-  neareight = 8,
-  nearnine = 9,
-  bomb = 10,
-  flag = 11,
-  Opened = 12,
-}
+
 
 // TODO 立体感を出す
 const CloseCell = styled.button`
@@ -45,19 +30,93 @@ const FlagCell = styled(CloseCell)`
 `
 
 const BombCell = styled(CloseCell)`
+  background: url(/minesweeper.png) no-repeat 77% 50%;
+`
+
+const NearOneCell = styled(OpenCell)`
+  background: url(/minesweeper.png) no-repeat 0% 50%;
+`
+
+const NearTwoCell = styled(OpenCell)`
+  background: url(/minesweeper.png) no-repeat 8% 50%;
+`
+
+const NearThreeCell = styled(OpenCell)`
   background: url(/minesweeper.png) no-repeat 16% 50%;
 `
+
+const NearFourCell = styled(OpenCell)`
+  background: url(/minesweeper.png) no-repeat 23% 50%;
+`
+
+const NearFiveCell = styled(OpenCell)`
+  background: url(/minesweeper.png) no-repeat 31% 50%;
+`
+
+const NearSixCell = styled(OpenCell)`
+  background: url(/minesweeper.png) no-repeat 38.5% 50%;
+`
+
+const NearSevenCell = styled(OpenCell)`
+  background: url(/minesweeper.png) no-repeat 46% 50%;
+`
+
+const NearEightCell = styled(OpenCell)`
+  background: url(/minesweeper.png) no-repeat 54% 50%;
+`
+
+const QuesttionCell = styled(OpenCell)`
+  background: url(/minesweeper.png) no-repeat 62% 50%;
+`
+
 // セルの情報を定義
 interface Cellinfo {
-  CellType: CellType
+  IsOpened: boolean
+  HasBomb: boolean
+  HasFlag: boolean
+  NearBombCount: number
 }
 
+const checkcelltype = (props: Cellinfo) => {
+  if (props.IsOpened === true) {
+    //開かれているかつ爆弾がある場合
+    if (props.HasBomb === true) {
+      return <BombCell />
+    }
+    //開かれているかつ爆弾がない場合
+    else {
+      switch (props.NearBombCount) {
+        case 1:
+          return <NearOneCell />
+        case 2:
+          return <NearTwoCell />
+        case 3:
+          return <NearThreeCell />
+        case 4:
+          return <NearFourCell />
+        case 5:
+          return <NearFiveCell />
+        case 6:
+          return <NearSixCell />
+        case 7:
+          return <NearSevenCell />
+        case 8:
+          return <NearEightCell />
+        default:
+          return <CloseCell />
+      }
+    }
+  } else {
+    //開かれていないかつ旗がある場合
+    if (props.HasFlag === true) {
+      return <FlagCell />
+    }
+    //開かれていないかつ旗がない場合
+    else {
+      return <CloseCell />
+    }
+  }
+}
 export const Cell = (props: Cellinfo) => {
-  return (
-    <div>
-      {props.CellType === CellType.None && <CloseCell />}
-      {props.CellType === CellType.bomb && <BombCell />}
-      {props.CellType === CellType.flag && <FlagCell />}
-    </div>
-  )
+  return checkcelltype(props)
 }
