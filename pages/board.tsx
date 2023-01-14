@@ -15,17 +15,10 @@ export const boardState = {
   Near7: 7,
   Near8: 8,
   Mine: 9,
-  Flag: 10,
 } as const
 export type BoardState = typeof boardState[keyof typeof boardState]
 
 //表示、非表示を管理する
-export const CellType = {
-  Close: 0,
-  Open: 1,
-} as const
-export type CellType = typeof CellType[keyof typeof CellType]
-
 const Container = styled.div`
   display: grid;
   width: 420px;
@@ -65,6 +58,19 @@ const InitialBoardData = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
+
+//for文で回して16*16の配列を作る
+const InitialIsHiddenData = () => {
+  const isHiddenData: boolean[][] = []
+  for (let i = 0; i < 16; i++) {
+    const row: boolean[] = []
+    for (let j = 0; j < 16; j++) {
+      row.push(true)
+    }
+    isHiddenData.push(row)
+  }
+  return isHiddenData
+}
 
 //爆弾の数を数えた配列を返す関数
 const countBomb = (board: number[][]) => {
@@ -128,14 +134,95 @@ const initBoard = (board: number[][]) => {
   return board
 }
 
+const openAround = (
+  board: number[][],
+  isHiddenboard: boolean[][],
+  i: number,
+  j: number
+) => {
+  const around = [
+    [i - 1, j - 1],
+    [i - 1, j],
+    [i - 1, j + 1],
+    [i, j - 1],
+    [i, j + 1],
+    [i + 1, j - 1],
+    [i + 1, j],
+    [i + 1, j + 1],
+  ]
+  const visited: number[][] = [[]]
+  around.forEach((pos) => {
+    const x = pos[0]
+    const y = pos[1]
+    //もし配列の範囲内だったら
+    if (x >= 0 && x < 16 && y >= 0 && y < 16) {
+      //もしHiddenだったら
+      if (isHiddenboard[x][y] === true) {
+        //もし0だったら
+        if (board[x][y] === 0) {
+          //もしまだ訪れていなかったら
+          if (visited.indexOf(pos) === -1) {
+            //訪れたことにする
+            visited.push(pos)
+            //そのマスを開く
+            isHiddenboard[x][y] = false
+            //そのマスの周りのマスを開く
+            openAround(board, isHiddenboard, x, y)
+          }
+        } else {
+          //もし0じゃなかったら
+          //そのマスを開く
+          isHiddenboard[x][y] = false
+        }
+      }
+    }
+  })
+}
+
+//左クリックした時の処理
+const leftClick = (
+  board: number[][],
+  isHiddenboard: boolean[][],
+  i: number,
+  j: number
+) => {
+  console.log('leftClick')
+  //もしHiddenだったら
+  if (isHiddenboard[i][j] === true) {
+    //switch文でboardの値によって処理を分ける
+    switch (board[i][j]) {
+      //もし0だったら
+      case 0:
+        //周りのマスを開く
+        openAround(board, isHiddenboard, i, j)
+        break
+      //もし1以上だったら
+      default:
+        //そのマスを開く
+        isHiddenboard[i][j] = false
+        break
+    }
+  }
+}
+
+// const rightClick = (
+//   board: number[][],
+//   isHiddenboard: boolean[][],
+//   i: number,
+//   j: number
+// ) => {
+//   console.log('rightClick')
+//   //もしHiddenだったら
+// }
+
+
 export const Board: NextPage = () => {
   const [board, setBoard] = React.useState(InitialBoardData)
+  const [isHiddenboard, setIsHiddenboard] = React.useState(InitialIsHiddenData)
   useEffect(() => {
     const Bombboard: number[][] = initBoard(board)
     setBoard(Bombboard)
-    console.log(Bombboard)
     //近くの爆弾の数を数える
-    console.log(countBomb(Bombboard))
     setBoard(countBomb(Bombboard))
   }, [])
   return (
@@ -145,8 +232,13 @@ export const Board: NextPage = () => {
           return (
             <Grid key={`${i}-${j}`}>
               <Cell
-                Celltype={0}
+                Ishidden={isHiddenboard[i][j]}
                 Boardstate={board[i][j]}
+                onClick={() => {
+                  leftClick(board, isHiddenboard, i, j)
+                  console.log(isHiddenboard)
+                  setIsHiddenboard(isHiddenboard.slice(0, board.length))
+                }}
               />
             </Grid>
           )
