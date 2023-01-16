@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import type { BoardState} from './board'
 
 // TODO 立体感を出す
 export const CloseCell = styled.button`
@@ -68,7 +67,6 @@ export interface Cellinfo {
 
 export const Cell = (props: Cellinfo) => {
   const { Ishidden, Boardstate, onClick } = props
-  const [isHidden, setIsHidden] = React.useState(Ishidden)
   //閉じているセルはCloseCellorFlagCellを表示
   if (Ishidden === true) {
     if (Boardstate === 10) {

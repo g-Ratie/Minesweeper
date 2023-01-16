@@ -3,6 +3,8 @@ import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { Cell } from './cells'
 
+const bombCount = 8
+
 //ボム数、マスの状態を管理する
 export const boardState = {
   None: 0,
@@ -17,6 +19,8 @@ export const boardState = {
   Mine: 9,
 } as const
 export type BoardState = typeof boardState[keyof typeof boardState]
+
+//TODO Ishideenにflagを追加する
 
 //表示、非表示を管理する
 const Container = styled.div`
@@ -123,13 +127,13 @@ const countBomb = (board: number[][]) => {
 //初期化関数
 const initBoard = (board: number[][]) => {
   //爆弾の数
-  const bombCount = 8
   //爆弾の配置
   for (let i = 0; i < bombCount; i++) {
     const x = Math.floor(Math.random() * 16)
     const y = Math.floor(Math.random() * 16)
     //CellのHasBombをtrueにする(配列上の値を9にする)
     board[x][y] = boardState.Mine
+    console.log(i, x, y)
   }
   return board
 }
@@ -215,15 +219,34 @@ const leftClick = (
 //   //もしHiddenだったら
 // }
 
+//勝敗判定
+const judge = (
+  board: number[][],
+  isHiddenboard: boolean[][],
+  i: number,
+  j: number
+) => {
+  //もしクリックされていないマスが爆弾の数と同じだったら
+  if (
+    isHiddenboard.flat().filter((cell) => cell === true).length === bombCount
+  ) {
+    //勝利
+    alert('勝利')
+  }
+  //もし爆弾がクリックされたら
+  if (board[i][j] === boardState.Mine) {
+    //敗北
+    alert('敗北')
+  }
+}
 
 export const Board: NextPage = () => {
   const [board, setBoard] = React.useState(InitialBoardData)
   const [isHiddenboard, setIsHiddenboard] = React.useState(InitialIsHiddenData)
   useEffect(() => {
     const Bombboard: number[][] = initBoard(board)
-    setBoard(Bombboard)
-    //近くの爆弾の数を数える
-    setBoard(countBomb(Bombboard))
+    const Countedboard = countBomb(Bombboard)
+    setBoard(Countedboard)
   }, [])
   return (
     <Container>
@@ -236,7 +259,7 @@ export const Board: NextPage = () => {
                 Boardstate={board[i][j]}
                 onClick={() => {
                   leftClick(board, isHiddenboard, i, j)
-                  console.log(isHiddenboard)
+                  judge(board, isHiddenboard, i, j)
                   setIsHiddenboard(isHiddenboard.slice(0, board.length))
                 }}
               />
