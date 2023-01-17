@@ -60,7 +60,7 @@ export const QuesttionCell = styled(OpenCell)`
 
 // セルの情報を定義
 export interface Cellinfo {
-  Ishidden: boolean
+  Ishidden: number
   Boardstate: number
   onClick: () => void
 }
@@ -68,12 +68,12 @@ export interface Cellinfo {
 export const Cell = (props: Cellinfo) => {
   const { Ishidden, Boardstate, onClick } = props
   //閉じているセルはCloseCellorFlagCellを表示
-  if (Ishidden === true) {
+  if (Ishidden === 1) {
     if (Boardstate === 10) {
       return <FlagCell />
     }
   }
-  if (Ishidden === false) {
+  if (Ishidden === 0) {
     switch (Boardstate) {
       case 0:
         return <OpenCell />

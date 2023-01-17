@@ -64,12 +64,13 @@ const InitialBoardData = [
 ]
 
 //for文で回して16*16の配列を作る
+//0=false,1=true,2
 const InitialIsHiddenData = () => {
-  const isHiddenData: boolean[][] = []
+  const isHiddenData: number[][] = []
   for (let i = 0; i < 16; i++) {
-    const row: boolean[] = []
+    const row: number[] = []
     for (let j = 0; j < 16; j++) {
-      row.push(true)
+      row.push(0)
     }
     isHiddenData.push(row)
   }
@@ -140,7 +141,7 @@ const initBoard = (board: number[][]) => {
 
 const openAround = (
   board: number[][],
-  isHiddenboard: boolean[][],
+  isHiddenboard: number[][],
   i: number,
   j: number
 ) => {
@@ -222,7 +223,7 @@ const leftClick = (
 //勝敗判定
 const judge = (
   board: number[][],
-  isHiddenboard: boolean[][],
+  isHiddenboard: number[][],
   i: number,
   j: number
 ) => {
